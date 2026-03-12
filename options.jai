@@ -5,38 +5,35 @@
 // handles individual options, and one logs a help string.
 
 
-handle_one_option :: (p: *Metaprogram_Plugin, options: [] string, cursor: int) -> new_cursor: int {
-    s := options[cursor];
-
+init :: (p: *Metaprogram_Plugin, options: [] string) -> bool {
     my := cast(*My_Plugin) p;
-    if s == {
+    for options if it == {
       case "-min_size";
-        if cursor >= options.count-1 {
+        if it_index >= options.count-1 {
             log_error("Command line: Missing argument to -min_size.\n");
-            return cursor + 1;
+            return false;
         }
 
-        arg := options[cursor+1];
+        arg := options[it_index+1];
         result, success, remainder := string_to_int(arg);
         if !success {
             log_error("[Iprof] Command line: Argument to -min_size was expected to be an integer, but we got '%'.\n", arg);
-            return cursor + 2;
+            return false;
         }
 
         if eat_spaces(remainder) {
             log_error("[Iprof] Command line: Found junk at the end of the argument to -min_size '%'.\n", remainder);
-            return cursor + 2;
+            return false;
         }
 
         my.min_size = result;
-        return cursor + 2;
+        it_index += 1;
 
       case "-modules";
         my.instrument_modules = true;
-        return cursor + 1;
     }
 
-    return cursor;  // We did not handle anything.
+    return true;
 }
 
 log_help :: (p: *Metaprogram_Plugin) {

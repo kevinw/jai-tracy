@@ -9,15 +9,13 @@
 get_plugin :: () -> *Metaprogram_Plugin {
     p := New(My_Plugin);  // We are making this on the heap so you could have more than one instance of this plugin running.
 
+    p.init             = init;
     p.before_intercept = before_intercept;
     p.add_source       = add_source;
     p.message          = message;
     p.finish           = finish;
     p.shutdown         = shutdown;
-
     p.log_help         = log_help;
-
-    p.handle_one_option = handle_one_option;
 
     BUFFER_SIZE :: 4096;
     buffer: [BUFFER_SIZE] u8;
